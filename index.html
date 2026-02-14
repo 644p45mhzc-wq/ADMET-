@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMET Optimization Evolution Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="mol_data.js"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>ADMET分子优化示例</h1>
+            <div id="molecule-count"></div>
+        </div>
+        <a href="flow.html" class="flow-btn">优化流程</a>
+    </header>
+
+    <nav id="sidebar">
+        <div class="sidebar-title">Navigation</div>
+        <div class="toggle-buttons">
+            <button id="toggle-rounds-1-8" class="toggle-btn">隐藏 Round 1-8</button>
+            <button id="toggle-rounds-9-14" class="toggle-btn">隐藏 Round 9-14</button>
+            <button id="auto-reveal" class="toggle-btn">自动展示</button>
+        </div>
+        <ul id="nav-list"></ul>
+    </nav>
+
+    <main id="content"></main>
+
+    <script src="script.js"></script>
+</body>
+</html>

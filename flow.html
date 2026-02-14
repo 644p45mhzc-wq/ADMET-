@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMET分子优化流程</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 40px 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        #diagram {
+            width: 100%;
+            min-height: 800px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← 返回示例</a>
+
+        <div class="header">
+            <h1>ADMET分子优化</h1>
+            <h2>NexAU Code Agent - 科研驾驶舱</h2>
+        </div>
+
+        <svg id="diagram" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- 阴影滤镜 -->
+                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                    <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.3"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+
+                <!-- 箭头标记 -->
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#666" />
+                </marker>
+            </defs>
+
+            <!-- 左侧区块 (黄色) -->
+            <rect x="20" y="50" width="350" height="360" rx="12" fill="#FFF9E6" stroke="#F2C94C" stroke-width="2" filter="url(#shadow)"/>
+
+            <!-- 左侧标题 -->
+            <rect x="40" y="70" width="310" height="50" rx="8" fill="#F2C94C" filter="url(#shadow)"/>
+            <text x="195" y="100" text-anchor="middle" font-size="20" font-weight="700" fill="#333">交互说明 (Input)</text>
+
+            <!-- 左侧内容区 - 5个小卡片 -->
+            <g id="left-content">
+                <!-- 第一行：角色设定 和 输入分子骨架 -->
+                <rect x="40" y="140" width="145" height="80" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+                <text x="112.5" y="165" text-anchor="middle" font-size="11" font-weight="600" fill="#333">角色设定</text>
+                <text x="112.5" y="185" text-anchor="middle" font-size="10" fill="#555">一位资深</text>
+                <text x="112.5" y="200" text-anchor="middle" font-size="10" fill="#555">科学家</text>
+
+                <rect x="195" y="140" width="145" height="80" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+                <text x="267.5" y="165" text-anchor="middle" font-size="11" font-weight="600" fill="#333">输入分子骨架</text>
+                <text x="267.5" y="190" text-anchor="middle" font-size="10" fill="#555">scaffold SMILES</text>
+
+                <!-- 第二行：约束 和 输出要求 -->
+                <rect x="40" y="235" width="145" height="80" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+                <text x="112.5" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#333">约束</text>
+                <text x="112.5" y="285" text-anchor="middle" font-size="10" fill="#555">RDKit 标准化</text>
+
+                <rect x="195" y="235" width="145" height="80" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+                <text x="267.5" y="260" text-anchor="middle" font-size="11" font-weight="600" fill="#333">输出要求</text>
+                <text x="267.5" y="280" text-anchor="middle" font-size="10" fill="#555">优化后的</text>
+                <text x="267.5" y="295" text-anchor="middle" font-size="10" fill="#555">分子结构</text>
+
+                <!-- 第三行：ADMET优化目标（撑满整行） -->
+                <rect x="40" y="330" width="300" height="60" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+                <text x="190" y="355" text-anchor="middle" font-size="11" font-weight="600" fill="#333">ADMET优化目标</text>
+                <text x="190" y="375" text-anchor="middle" font-size="10" fill="#555">logP↓  QED↑  PPBR_AZ↓  DILI↓  Caco2↑</text>
+            </g>
+
+            <!-- Agent启动区块 (独立黄色框) -->
+            <rect x="20" y="440" width="350" height="190" rx="12" fill="#FFF9E6" stroke="#F2C94C" stroke-width="2" filter="url(#shadow)"/>
+
+            <!-- nexau_code_agent 启动 -->
+            <rect x="40" y="460" width="310" height="40" rx="8" fill="#F2C94C" filter="url(#shadow)"/>
+            <text x="195" y="485" text-anchor="middle" font-size="14" font-weight="600" fill="#333">nexau_code_agent 启动</text>
+
+            <!-- 三个小卡片 -->
+            <rect x="50" y="520" width="90" height="60" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+            <text x="95" y="545" text-anchor="middle" font-size="10" fill="#333">读取</text>
+            <text x="95" y="560" text-anchor="middle" font-size="10" fill="#333">优化目标</text>
+
+            <rect x="150" y="520" width="90" height="60" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+            <text x="195" y="545" text-anchor="middle" font-size="10" fill="#333">初始化</text>
+            <text x="195" y="560" text-anchor="middle" font-size="10" fill="#333">优化策略</text>
+
+            <rect x="250" y="520" width="90" height="60" rx="6" fill="#FFF4CC" filter="url(#shadow)"/>
+            <text x="295" y="545" text-anchor="middle" font-size="10" fill="#333">准备进入</text>
+            <text x="295" y="560" text-anchor="middle" font-size="10" fill="#333">迭代流程</text>
+
+            <!-- 中间区块 (蓝色) -->
+            <rect x="400" y="50" width="700" height="580" rx="12" fill="#E8F4FF" stroke="#BFD7FF" stroke-width="2" filter="url(#shadow)"/>
+
+            <!-- 中间标题 -->
+            <rect x="570" y="65" width="360" height="45" rx="8" fill="#A0C8FF" filter="url(#shadow)"/>
+            <text x="750" y="93" text-anchor="middle" font-size="18" font-weight="700" fill="#333">单轮优化迭代（执行 n 轮）</text>
+
+            <!-- Step 1 -->
+            <g id="step1">
+                <rect x="440" y="155" width="280" height="110" rx="10" fill="#BFD7FF" filter="url(#shadow)"/>
+                <circle cx="460" cy="175" r="18" fill="white" stroke="#666" stroke-width="2"/>
+                <text x="460" y="182" text-anchor="middle" font-size="16" font-weight="700" fill="#333">1</text>
+                <text x="580" y="185" text-anchor="middle" font-size="14" font-weight="600" fill="#333">OpenAI 推理生成候选分子</text>
+                <text x="460" y="210" font-size="11" fill="#333">• 基于当前最优结构</text>
+                <text x="460" y="230" font-size="11" fill="#333">• 进行结构修饰</text>
+                <text x="460" y="250" font-size="11" fill="#333">• 生成 n 个候选 SMILES</text>
+            </g>
+
+            <!-- Step 2 -->
+            <g id="step2">
+                <rect x="440" y="295" width="280" height="75" rx="10" fill="#BFD7FF" filter="url(#shadow)"/>
+                <circle cx="460" cy="315" r="18" fill="white" stroke="#666" stroke-width="2"/>
+                <text x="460" y="322" text-anchor="middle" font-size="16" font-weight="700" fill="#333">2</text>
+                <text x="580" y="325" text-anchor="middle" font-size="14" font-weight="600" fill="#333">标准化</text>
+                <text x="580" y="350" text-anchor="middle" font-size="11" fill="#333">RDKit 规范化 SMILES</text>
+            </g>
+
+            <!-- Step 3 -->
+            <g id="step3">
+                <rect x="440" y="400" width="280" height="95" rx="10" fill="#BFD7FF" filter="url(#shadow)"/>
+                <circle cx="460" cy="420" r="18" fill="white" stroke="#666" stroke-width="2"/>
+                <text x="460" y="427" text-anchor="middle" font-size="16" font-weight="700" fill="#333">3</text>
+                <text x="580" y="430" text-anchor="middle" font-size="14" font-weight="600" fill="#333">调用 admet_predict</text>
+                <text x="580" y="450" text-anchor="middle" font-size="11" fill="#333">（批量预测）</text>
+                <text x="460" y="475" font-size="10" fill="#333">输入: smiles_list (n个)</text>
+                <text x="460" y="488" font-size="10" fill="#333">输出: 每个分子的 ADMET 指标</text>
+            </g>
+
+            <!-- Step 4 -->
+            <g id="step4">
+                <rect x="790" y="400" width="280" height="110" rx="10" fill="#BFD7FF" filter="url(#shadow)"/>
+                <circle cx="810" cy="420" r="18" fill="white" stroke="#666" stroke-width="2"/>
+                <text x="810" y="427" text-anchor="middle" font-size="16" font-weight="700" fill="#333">4</text>
+                <text x="930" y="430" text-anchor="middle" font-size="14" font-weight="600" fill="#333">分析预测结果</text>
+                <text x="930" y="455" text-anchor="middle" font-size="11" fill="#333">选择当前最佳分子</text>
+                <text x="930" y="475" text-anchor="middle" font-size="11" fill="#333">评估改进方向</text>
+                <text x="930" y="495" text-anchor="middle" font-size="11" fill="#333">对比优化目标趋势</text>
+            </g>
+
+            <!-- Step 5 -->
+            <g id="step5">
+                <rect x="790" y="155" width="280" height="115" rx="10" fill="#BFD7FF" filter="url(#shadow)"/>
+                <circle cx="810" cy="175" r="18" fill="white" stroke="#666" stroke-width="2"/>
+                <text x="810" y="182" text-anchor="middle" font-size="16" font-weight="700" fill="#333">5</text>
+                <text x="930" y="190" text-anchor="middle" font-size="14" font-weight="600" fill="#333">更新当前最优结构</text>
+                <text x="930" y="215" text-anchor="middle" font-size="10" fill="#333">进行下一轮优化</text>
+                <text x="930" y="230" text-anchor="middle" font-size="10" fill="#333">将最佳分子作为</text>
+                <text x="930" y="245" text-anchor="middle" font-size="10" fill="#333">下一轮输入</text>
+            </g>
+
+            <!-- 箭头 -->
+            <!-- 交互说明到Agent启动 -->
+            <path d="M 195 410 L 195 440" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Agent启动到Step 1 -->
+            <path d="M 370 550 L 440 215" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 1 到 Step 2 -->
+            <path d="M 580 265 L 580 295" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 2 到 Step 3 -->
+            <path d="M 580 370 L 580 400" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 3 到 Step 4 -->
+            <path d="M 720 447 L 790 447" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 4 到 Step 5 -->
+            <path d="M 930 400 L 930 270" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 5 回到 Step 1 -->
+            <path d="M 790 212 Q 740 212 740 212 L 720 212" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Step 5 到右侧输出 -->
+            <path d="M 1070 212 L 1130 212" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+            <text x="1100" y="197" text-anchor="middle" font-size="9" fill="#666">达到迭代上限/</text>
+            <text x="1100" y="207" text-anchor="middle" font-size="9" fill="#666">指标收敛</text>
+
+            <!-- 右侧区块 (粉色) -->
+            <rect x="1130" y="50" width="250" height="580" rx="12" fill="#FFE8EC" stroke="#E7A1A6" stroke-width="2" filter="url(#shadow)"/>
+
+            <!-- 右侧标题 -->
+            <rect x="1150" y="300" width="210" height="50" rx="8" fill="#E7A1A6" filter="url(#shadow)"/>
+            <text x="1255" y="330" text-anchor="middle" font-size="16" font-weight="700" fill="#333">输出最终优化分子</text>
+            <text x="1255" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#333">(Output)</text>
+
+            <!-- 输出指标 -->
+            <rect x="1150" y="370" width="210" height="40" rx="8" fill="#FFD4D9" filter="url(#shadow)"/>
+            <text x="1255" y="395" text-anchor="middle" font-size="13" font-weight="600" fill="#333">输出对应预测指标</text>
+        </svg>
+    </div>
+</body>
+</html>
