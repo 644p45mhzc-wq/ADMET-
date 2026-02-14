@@ -40,7 +40,6 @@ const moleculeData = [
   {"Round": "round8", "SMILES": "O=C(Cc1ccc(OC)cc1)N[C@@H]1C(=O)N2CC(OC(=O)C)S[C@H]12", "logP": 0.527, "QED": 0.616, "PPBR_AZ": 66.110, "DILI": 0.661, "Caco2_Wang": -5.217},
   {"Round": "round8", "SMILES": "CC(O)C(=O)N[C@@H]1C(=O)N2CC(SC(=O)C)[C@H]12", "logP": -1.275, "QED": 0.616, "PPBR_AZ": 22.795, "DILI": 0.288, "Caco2_Wang": -5.865},
   {"Round": "round8", "SMILES": "O=C(NCc1ccc(O)cc1)[C@@H]1C(=O)N2CCSC(=O)[C@H]12", "logP": 0.109, "QED": 0.611, "PPBR_AZ": 60.489, "DILI": 0.437, "Caco2_Wang": -5.550},
-  {"Round": "result1", "SMILES": "O=C(NCc1ccc(O)cc1)[C@@H]1C(=O)N2CCSC(=O)[C@H]12", "logP": 0.109, "QED": 0.611, "PPBR_AZ": 60.489, "DILI": 0.437, "Caco2_Wang": -5.550},
   {"Round": "round9", "SMILES": "O=C(NCc1ccc(O)cc1)[C@@H]1C(=O)N2CC(O)SC(=O)[C@H]12", "logP": -0.573, "QED": 0.508, "PPBR_AZ": 51.638, "DILI": 0.443, "Caco2_Wang": -5.920},
   {"Round": "round9", "SMILES": "O=C(NCc1ccc(O)c(O)c1)[C@@H]1C(=O)N2CCS[C@H]12", "logP": 0.245, "QED": 0.422, "PPBR_AZ": 52.828, "DILI": 0.375, "Caco2_Wang": -5.680},
   {"Round": "round9", "SMILES": "CC(O)NC(=O)[C@@H]1C(=O)N2CCSC(=O)[C@H]12", "logP": -1.459, "QED": 0.352, "PPBR_AZ": 24.559, "DILI": 0.557, "Caco2_Wang": -5.545},
@@ -74,7 +73,7 @@ const moleculeData = [
   {"Round": "final", "SMILES": "O=C(Cc1cc(O)cc(O)c1)N[C@@H]1C(=O)N2CCS[C@H]12", "logP": 0.040, "QED": 0.685, "PPBR_AZ": 57.409, "DILI": 0.272, "Caco2_Wang": -5.607}
 ];
 
-let roundOrder = ['initial', 'round1', 'round2', 'round3', 'round4', 'round5', 'round6', 'round7', 'round8', 'result1', 'round9', 'round10', 'round11', 'round12', 'round13', 'round14', 'final'];
+let roundOrder = ['initial', 'round1', 'round2', 'round3', 'round4', 'round5', 'round6', 'round7', 'round8', 'round9', 'round10', 'round11', 'round12', 'round13', 'round14', 'final'];
 
 function loadData() {
     processAndRender();
@@ -272,10 +271,10 @@ function generateNavigation(groupedData) {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = `#round-${round}`;
-            a.textContent = round === 'initial' ? 'Initial' : round === 'result1' ? 'Result 1' : round === 'final' ? 'Final' : `Round ${round.replace('round', '')}`;
+            a.textContent = round === 'initial' ? 'Initial' : round === 'final' ? 'Final' : `Round ${round.replace('round', '')}`;
 
-            // Add special class for initial, result1, and final
-            if (round === 'initial' || round === 'result1' || round === 'final') {
+            // Add special class for initial and final
+            if (round === 'initial' || round === 'final') {
                 a.classList.add('special-round');
             }
 
@@ -348,7 +347,7 @@ function createRoundSection(roundName, molecules, index) {
 
     const title = document.createElement('h2');
     title.className = 'round-title';
-    title.textContent = roundName === 'initial' ? 'Initial' : roundName === 'result1' ? 'Result 1' : roundName === 'final' ? 'Final' : `Round ${roundName.replace('round', '')}`;
+    title.textContent = roundName === 'initial' ? 'Initial' : roundName === 'final' ? 'Final' : `Round ${roundName.replace('round', '')}`;
     section.appendChild(title);
 
     const grid = document.createElement('div');

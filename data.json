@@ -369,15 +369,6 @@
     "Caco2_Wang": -5.550257823439563
   },
   {
-    "Round": "result1",
-    "SMILES": "O=C(NCc1ccc(O)cc1)[C@@H]1C(=O)N2CCSC(=O)[C@H]12",
-    "logP": 0.1087999999999996,
-    "QED": 0.6112320625675438,
-    "PPBR_AZ": 60.48931690154173,
-    "DILI": 0.4370410680770874,
-    "Caco2_Wang": -5.550257823439563
-  },
-  {
     "Round": "round9",
     "SMILES": "O=C(NCc1ccc(O)cc1)[C@@H]1C(=O)N2CC(O)SC(=O)[C@H]12",
     "logP": -0.5728000000000009,
