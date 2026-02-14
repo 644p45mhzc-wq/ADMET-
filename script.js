@@ -81,53 +81,31 @@ function loadData() {
 }
 
 function setupToggleButtons() {
-    const toggle18Btn = document.getElementById('toggle-rounds-1-8');
-    const toggle914Btn = document.getElementById('toggle-rounds-9-14');
+    const toggleRoundsBtn = document.getElementById('toggle-rounds');
     const autoRevealBtn = document.getElementById('auto-reveal');
 
-    let rounds18Hidden = false;
-    let rounds914Hidden = false;
+    let roundsHidden = false;
     let isRevealing = false;
     let revealTimeouts = [];
 
-    toggle18Btn.addEventListener('click', () => {
-        rounds18Hidden = !rounds18Hidden;
-        const rounds = ['round1', 'round2', 'round3', 'round4', 'round5', 'round6', 'round7', 'round8'];
+    toggleRoundsBtn.addEventListener('click', () => {
+        roundsHidden = !roundsHidden;
+        const rounds = ['round1', 'round2', 'round3', 'round4', 'round5', 'round6', 'round7', 'round8', 'round9', 'round10', 'round11', 'round12', 'round13', 'round14'];
 
         rounds.forEach(round => {
             const section = document.getElementById(`round-${round}`);
             const navItem = document.querySelector(`#nav-list a[href="#round-${round}"]`);
 
             if (section) {
-                section.style.display = rounds18Hidden ? 'none' : 'block';
+                section.style.display = roundsHidden ? 'none' : 'block';
             }
             if (navItem) {
-                navItem.parentElement.style.display = rounds18Hidden ? 'none' : 'block';
+                navItem.parentElement.style.display = roundsHidden ? 'none' : 'block';
             }
         });
 
-        toggle18Btn.textContent = rounds18Hidden ? '显示 Round 1-8' : '隐藏 Round 1-8';
-        toggle18Btn.classList.toggle('active', rounds18Hidden);
-    });
-
-    toggle914Btn.addEventListener('click', () => {
-        rounds914Hidden = !rounds914Hidden;
-        const rounds = ['round9', 'round10', 'round11', 'round12', 'round13', 'round14'];
-
-        rounds.forEach(round => {
-            const section = document.getElementById(`round-${round}`);
-            const navItem = document.querySelector(`#nav-list a[href="#round-${round}"]`);
-
-            if (section) {
-                section.style.display = rounds914Hidden ? 'none' : 'block';
-            }
-            if (navItem) {
-                navItem.parentElement.style.display = rounds914Hidden ? 'none' : 'block';
-            }
-        });
-
-        toggle914Btn.textContent = rounds914Hidden ? '显示 Round 9-14' : '隐藏 Round 9-14';
-        toggle914Btn.classList.toggle('active', rounds914Hidden);
+        toggleRoundsBtn.textContent = roundsHidden ? '显示 Round 1-14' : '隐藏 Round 1-14';
+        toggleRoundsBtn.classList.toggle('active', roundsHidden);
     });
 
     autoRevealBtn.addEventListener('click', () => {
