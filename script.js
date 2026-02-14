@@ -74,10 +74,21 @@ const moleculeData = [
 ];
 
 let roundOrder = ['initial', 'round1', 'round2', 'round3', 'round4', 'round5', 'round6', 'round7', 'round8', 'round9', 'round10', 'round11', 'round12', 'round13', 'round14', 'final'];
+let currentDisplayMode = '3d';
+
+// Initial molecule baseline values
+const initialBaseline = {
+    logP: 0.629,
+    QED: 0.813,
+    PPBR_AZ: 54.246,
+    DILI: 0.375,
+    Caco2_Wang: -4.955
+};
 
 function loadData() {
     processAndRender();
     setupToggleButtons();
+    setupDisplayModeSelector();
 }
 
 function setupToggleButtons() {
@@ -188,6 +199,107 @@ function setupToggleButtons() {
             revealTimeouts.push(timeout);
         });
     });
+}
+
+function setupDisplayModeSelector() {
+    const selector = document.getElementById('display-mode');
+
+    selector.addEventListener('change', (e) => {
+        currentDisplayMode = e.target.value;
+        updateAllViewers();
+    });
+}
+
+function updateAllViewers() {
+    const viewers = document.querySelectorAll('.viewer-container');
+
+    viewers.forEach(container => {
+        const smiles = container.dataset.smiles;
+        const id = container.id;
+
+        // Clear existing content
+        container.innerHTML = '';
+        container.className = 'viewer-container';
+
+        if (currentDisplayMode === '3d') {
+            container.classList.add('viewer-3d');
+            render3DStructure(container, smiles);
+        } else if (currentDisplayMode === '2d') {
+            container.classList.add('viewer-2d');
+            render2DStructure(container, smiles);
+        } else if (currentDisplayMode === 'both') {
+            container.classList.add('viewer-both');
+
+            const viewer3d = document.createElement('div');
+            viewer3d.className = 'viewer-3d';
+            viewer3d.id = `${id}-3d`;
+            container.appendChild(viewer3d);
+
+            const viewer2d = document.createElement('div');
+            viewer2d.className = 'viewer-2d';
+            viewer2d.id = `${id}-2d`;
+            container.appendChild(viewer2d);
+
+            render3DStructure(viewer3d, smiles);
+            render2DStructure(viewer2d, smiles);
+        }
+    });
+}
+
+function render3DStructure(container, smiles) {
+    try {
+        const molData = molDataMap[smiles];
+
+        if (!molData) {
+            console.error(`No MOL data found for SMILES: ${smiles}`);
+            container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999;">No 3D data</p>';
+            return;
+        }
+
+        const viewer = $3Dmol.createViewer(container, {
+            backgroundColor: '#ffffff'
+        });
+
+        viewer.addModel(molData, 'mol');
+
+        viewer.setStyle({}, {
+            sphere: {
+                scale: 0.3,
+                colorscheme: 'default'
+            },
+            stick: {
+                radius: 0.15,
+                colorscheme: 'default'
+            }
+        });
+
+        viewer.zoomTo();
+        viewer.render();
+
+    } catch (error) {
+        console.error(`Error rendering 3D molecule:`, error);
+        container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999;">Render error</p>';
+    }
+}
+
+function render2DStructure(container, smiles) {
+    try {
+        // Get SVG data from the pre-generated map
+        const svgData = svgDataMap[smiles];
+
+        if (!svgData) {
+            console.error(`No SVG data found for SMILES: ${smiles}`);
+            container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999; font-size: 11px;">无2D数据</p>';
+            return;
+        }
+
+        // Insert the SVG directly
+        container.innerHTML = svgData;
+
+    } catch (error) {
+        console.error(`Error rendering 2D molecule:`, error);
+        container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999; font-size: 11px;">渲染错误</p>';
+    }
 }
 
 function processAndRender() {
@@ -332,15 +444,24 @@ function createRoundSection(roundName, molecules, index) {
     grid.className = 'molecule-grid';
 
     molecules.forEach((molecule, idx) => {
-        const card = createMoleculeCard(molecule, `${roundName}-${idx}`);
+        const card = createMoleculeCard(molecule, `${roundName}-${idx}`, roundName);
         grid.appendChild(card);
     });
 
     section.appendChild(grid);
+
+    // Add thinking block for round1-14
+    if (roundName.startsWith('round')) {
+        const thinkingBlock = document.createElement('div');
+        thinkingBlock.className = 'thinking-block';
+        thinkingBlock.textContent = 'Thinking：';
+        section.appendChild(thinkingBlock);
+    }
+
     return section;
 }
 
-function createMoleculeCard(molecule, id) {
+function createMoleculeCard(molecule, id, roundName) {
     const card = document.createElement('div');
     card.className = 'molecule-card';
 
@@ -386,29 +507,59 @@ function createMoleculeCard(molecule, id) {
     legend.innerHTML = legendHTML;
     card.appendChild(legend);
 
-    const table = document.createElement('table');
-    table.className = 'metrics-table';
-    table.innerHTML = `
+    // Calculate differences from initial baseline
+    const isInitial = roundName === 'initial';
+    const diff = {
+        logP: molecule.logP - initialBaseline.logP,
+        QED: molecule.QED - initialBaseline.QED,
+        PPBR_AZ: molecule.PPBR_AZ - initialBaseline.PPBR_AZ,
+        DILI: molecule.DILI - initialBaseline.DILI,
+        Caco2_Wang: molecule.Caco2_Wang - initialBaseline.Caco2_Wang
+    };
+
+    // Build table HTML - split into two rows
+    let tableHTML = `
         <thead>
             <tr>
                 <th>logP</th>
                 <th>QED</th>
                 <th>PPBR_AZ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${molecule.logP.toFixed(3)}${!isInitial ? `<br><span style="color: ${diff.logP > 0 ? '#dc3545' : '#28a745'}">(${diff.logP > 0 ? '+' : ''}${diff.logP.toFixed(3)})</span>` : ''}</td>
+                <td>${molecule.QED.toFixed(3)}${!isInitial ? `<br><span style="color: ${diff.QED > 0 ? '#dc3545' : '#28a745'}">(${diff.QED > 0 ? '+' : ''}${diff.QED.toFixed(3)})</span>` : ''}</td>
+                <td>${molecule.PPBR_AZ.toFixed(3)}${!isInitial ? `<br><span style="color: ${diff.PPBR_AZ > 0 ? '#dc3545' : '#28a745'}">(${diff.PPBR_AZ > 0 ? '+' : ''}${diff.PPBR_AZ.toFixed(3)})</span>` : ''}</td>
+            </tr>
+        </tbody>
+    `;
+
+    const table1 = document.createElement('table');
+    table1.className = 'metrics-table';
+    table1.innerHTML = tableHTML;
+    card.appendChild(table1);
+
+    // Second table for DILI and Caco2
+    let tableHTML2 = `
+        <thead>
+            <tr>
                 <th>DILI</th>
                 <th>Caco2</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>${molecule.logP.toFixed(3)}</td>
-                <td>${molecule.QED.toFixed(3)}</td>
-                <td>${molecule.PPBR_AZ.toFixed(3)}</td>
-                <td>${molecule.DILI.toFixed(3)}</td>
-                <td>${molecule.Caco2_Wang.toFixed(3)}</td>
+                <td>${molecule.DILI.toFixed(3)}${!isInitial ? `<br><span style="color: ${diff.DILI > 0 ? '#dc3545' : '#28a745'}">(${diff.DILI > 0 ? '+' : ''}${diff.DILI.toFixed(3)})</span>` : ''}</td>
+                <td>${molecule.Caco2_Wang.toFixed(3)}${!isInitial ? `<br><span style="color: ${diff.Caco2_Wang > 0 ? '#dc3545' : '#28a745'}">(${diff.Caco2_Wang > 0 ? '+' : ''}${diff.Caco2_Wang.toFixed(3)})</span>` : ''}</td>
             </tr>
         </tbody>
     `;
-    card.appendChild(table);
+
+    const table2 = document.createElement('table');
+    table2.className = 'metrics-table';
+    table2.innerHTML = tableHTML2;
+    card.appendChild(table2);
 
     return card;
 }
@@ -419,42 +570,27 @@ function initializeViewers() {
     viewers.forEach(container => {
         const smiles = container.dataset.smiles;
 
-        try {
-            // Get MOL data from the pre-generated map
-            const molData = molDataMap[smiles];
+        if (currentDisplayMode === '3d') {
+            container.classList.add('viewer-3d');
+            render3DStructure(container, smiles);
+        } else if (currentDisplayMode === '2d') {
+            container.classList.add('viewer-2d');
+            render2DStructure(container, smiles);
+        } else if (currentDisplayMode === 'both') {
+            container.classList.add('viewer-both');
 
-            if (!molData) {
-                console.error(`No MOL data found for SMILES: ${smiles}`);
-                container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999;">No 3D data</p>';
-                return;
-            }
+            const viewer3d = document.createElement('div');
+            viewer3d.className = 'viewer-3d';
+            viewer3d.id = `${container.id}-3d`;
+            container.appendChild(viewer3d);
 
-            // Create 3Dmol viewer
-            const viewer = $3Dmol.createViewer(container, {
-                backgroundColor: '#ffffff'
-            });
+            const viewer2d = document.createElement('div');
+            viewer2d.className = 'viewer-2d';
+            viewer2d.id = `${container.id}-2d`;
+            container.appendChild(viewer2d);
 
-            // Add model from MOL data
-            viewer.addModel(molData, 'mol');
-
-            // Set style with ball and stick representation
-            viewer.setStyle({}, {
-                sphere: {
-                    scale: 0.3,
-                    colorscheme: 'default'
-                },
-                stick: {
-                    radius: 0.15,
-                    colorscheme: 'default'
-                }
-            });
-
-            viewer.zoomTo();
-            viewer.render();
-
-        } catch (error) {
-            console.error(`Error rendering molecule:`, error);
-            container.innerHTML = '<p style="text-align: center; padding: 80px 20px; color: #999;">Render error</p>';
+            render3DStructure(viewer3d, smiles);
+            render2DStructure(viewer2d, smiles);
         }
     });
 }
